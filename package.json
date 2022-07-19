@@ -1,0 +1,22 @@
+{
+  "name": "desafio-entregable-6-websocket",
+  "version": "1.0.0",
+  "description": "",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon ./src/server.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.18.1",
+    "knex": "^2.1.0",
+    "mysql": "^2.18.1",
+    "nodemon": "^2.0.18",
+    "socket.io": "^4.5.1",
+    "ts-node": "^10.8.1",
+    "sqlite3": "^5.0.8"
+  }
+}
