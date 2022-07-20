@@ -13,7 +13,6 @@ const __dirname = path.dirname(__filename);
 import {mySqlConnection, mySqliteConnection} from '../public/dataBasesConfig.js'
 
 
-
 app.use(express.json())
 app.use(express.urlencoded())
 
@@ -31,25 +30,32 @@ const expressServer = app.listen(port, (error) =>{
 
 const io = new IOServer(expressServer)
 
-io.on('connection', socket =>{
-    io.emit('server:message', showMessages())
-    io.emit('server:produtsArray', showProducts())
-    console.log(showProducts())
+io.on('connection', async socket =>{
+    const showProductsAll = await showProducts()
+    const showMessageAll = await showMessages()
 
-    socket.on('client:message', messageInfo => {
+
+    io.emit('server:message', showMessageAll)
+
+
+    io.emit('server:produtsArray', showProductsAll)
+    
+    socket.on('client:message', async messageInfo => {
         
-        insertMessage(messageInfo)
-        io.emit('server:message', showMessages())
+        await insertMessage(messageInfo)
+        io.emit('server:message', showMessageAll)
     })
 
-    socket.on('client:newProduct', newProductInfo =>{
+    socket.on('client:newProduct', async newProductInfo =>{
 
-        insertProduct(newProductInfo)
+        await insertProduct(newProductInfo)
         
-        io.emit('server:newProduct', showProducts())
+        io.emit('server:newProduct', showProductsAll)
     })
 
 })
+
+
 
 
 const insertProduct = async (newProductInfo) => {
@@ -61,11 +67,12 @@ const insertProduct = async (newProductInfo) => {
     }
 }
 
-const showProducts = async () =>{
+const showProducts = async () => {
     try{
 
-        const allProducts =  JSON.parse(JSON.stringify(await mySqlConnection.select('*').from('productsList')))
-        return(allProducts)
+        const allProducts =  await mySqlConnection.select('*').from('productsList')
+        const allProductsShow = JSON.parse(JSON.stringify(allProducts))
+        return(allProductsShow)
     
     }catch(err){
         console.log(err)
@@ -86,7 +93,7 @@ const insertMessage = async (messageInfo) =>{
 const showMessages = async () =>{
     try{
 
-        const allmessages = JSON.stringify(await mySqliteConnection.select('*').from('messageList'))
+        const allmessages = JSON.parse(JSON.stringify(await mySqliteConnection.select('*').from('messageList')))
         return(allmessages)
 
     }catch(err){
